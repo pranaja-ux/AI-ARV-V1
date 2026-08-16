@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Smart Chatbot</title>
+
+<style>
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: #101114;
+    color: white;
+}
+
+.chat {
+    max-width: 600px;
+    height: 100vh;
+    margin: auto;
+    display: flex;
+    flex-direction: column;
+}
+
+.header {
+    padding: 18px;
+    background: #191b21;
+    font-size: 21px;
+    font-weight: bold;
+    border-bottom: 1px solid #30323a;
+}
+
+.messages {
+    flex: 1;
+    overflow-y: auto;
+    padding: 15px;
+}
+
+.message {
+    max-width: 82%;
+    padding: 12px 15px;
+    margin: 10px 0;
+    border-radius: 16px;
+    line-height: 1.45;
+    white-space: pre-wrap;
+}
+
+.bot {
+    background: #272a32;
+}
+
+.user {
+    background: #315cff;
+    margin-left: auto;
+}
+
+.inputArea {
+    display: flex;
+    gap: 8px;
+    padding: 12px;
+    background: #191b21;
+}
+
+input {
+    flex: 1;
+    border: none;
+    outline: none;
+    padding: 14px;
+    border-radius: 12px;
+    background: #292c34;
+    color: white;
+    font-size: 15px;
+}
+
+button {
+    border: none;
+    border-radius: 12px;
+    padding: 0 18px;
+    background: #315cff;
+    color: white;
+    font-weight: bold;
+}
+</style>
+</head>
+
+<body>
+
+<div class="chat">
+
+    <div class="header">
+        🤖 Smart Chatbot
+    </div>
+
+    <div class="messages" id="messages">
+
+        <div class="message bot">
+            Halo! 👋 Aku Smart Chatbot.
+            Aku bisa ngobrol, menghitung, mengingat nama, dan menjawab berbagai pertanyaan.
+        </div>
+
+    </div>
+
+    <div class="inputArea">
+
+        <input
+            id="input"
+            type="text"
+            placeholder="Tulis pertanyaan..."
+            autocomplete="off"
+        >
+
+        <button onclick="sendMessage()">
+            Kirim
+        </button>
+
+    </div>
+
+</div>
+
+<script>
+
+let userName = "";
+
+function addMessage(text, type) {
+
+    const messages = document.getElementById("messages");
+
+    const message = document.createElement("div");
+
+    message.className = "message " + type;
+
+    message.textContent = text;
+
+    messages.appendChild(message);
+
+    messages.scrollTop = messages.scrollHeight;
+}
+
+
+function calculate(text) {
+
+    try {
+
+        let expression = text
+            .replace(/berapa/g, "")
+            .replace(/hitung/g, "")
+            .replace(/hasil dari/g, "")
+            .replace(/x/g, "*")
+            .replace(/÷/g, "/");
+
+        if (/^[0-9+\-*/().%\s]+$/.test(expression)) {
+
+            let result = Function(
+                '"use strict"; return (' + expression + ')'
+            )();
+
+            if (typeof result === "number" && isFinite(result)) {
+                return "Hasilnya adalah " + result;
+            }
+
+        }
+
+    } catch (e) {}
+
+    return null;
+}
+
+
+function chatbot(text) {
+
+    const original = text.trim();
+
+    const lower = original.toLowerCase();
+
+
+    // Nama
+
+    if (
+        lower.includes("nama saya") ||
+        lower.includes("namaku") ||
+        lower.includes("nama ku")
+    ) {
+
+        let name = original
+            .replace(/nama saya/i, "")
+            .replace(/namaku/i, "")
+            .replace(/nama ku/i, "")
+            .trim();
+
+        if (name) {
+
+            userName = name;
+
+            return "Oke! Aku akan memanggilmu " + userName + " mulai sekarang. 😎";
+
+        }
+
+        return "Siapa namamu?";
+
+    }
+
+
+    if (
+        lower.includes("siapa nama saya") ||
+        lower.includes("kamu ingat nama saya")
+    ) {
+
+        if (userName) {
+            return "Tentu! Namamu " + userName + " 😎";
+        }
+
+        return "Kamu belum memberitahuku namamu.";
+
+    }
+
+
+    // Salam
+
+    if (
+        lower.includes("halo") ||
+        lower.includes("hai") ||
+        lower.includes("hello") ||
+        lower.includes("hey")
+    ) {
+
+        return userName
+            ? "Halo, " + userName + "! 👋"
+            : "Halo! 👋 Senang bertemu denganmu!";
+
+    }
+
+
+    // Identitas
+
+    if (
+        lower.includes("siapa kamu") ||
+        lower.includes("kamu siapa") ||
+        lower.includes("apa kamu")
+    ) {
+
+        return "Aku adalah Smart Chatbot 🤖. Aku dibuat menggunakan HTML, CSS, dan JavaScript.";
+
+    }
+
+
+    // Kemampuan
+
+    if (
+        lower.includes("kamu bisa apa") ||
+        lower.includes("apa yang bisa kamu lakukan") ||
+        lower.includes("kemampuanmu")
+    ) {
+
+        return "Aku bisa ngobrol, menjawab pertanyaan sederhana, mengingat namamu selama halaman ini terbuka, dan menghitung angka.";
+
+    }
+
+
+    // Kabar
+
+    if (
+        lower.includes("apa kabar") ||
+        lower.includes("gimana kabarmu") ||
+        lower.includes("kabar kamu")
+    ) {
+
+        return "Aku baik dan siap ngobrol! 😎";
+
+    }
+
+
+    // Terima kasih
+
+    if (
+        lower.includes("terima kasih") ||
+        lower.includes("makasih") ||
+        lower.includes("thanks")
+    ) {
+
+        return "Sama-sama! 😎";
+
+    }
+
+
+    // Roblox
+
+    if (lower.includes("roblox")) {
+
+        return "Roblox adalah platform tempat orang bisa bermain dan membuat berbagai pengalaman/game.";
+
+    }
+
+
+    // Coding
+
+    if (
+        lower.includes("html") ||
+        lower.includes("javascript") ||
+        lower.includes("coding") ||
+        lower.includes("programming")
+    ) {
+
+        return "HTML digunakan untuk struktur halaman, CSS untuk tampilannya, dan JavaScript untuk membuat halaman menjadi interaktif.";
+
+    }
+
+
+    // Cuaca
+
+    if (
+        lower.includes("cuaca") ||
+        lower.includes("hujan") ||
+        lower.includes("panas")
+    ) {
+
+        return "Aku tidak bisa melihat cuaca secara langsung tanpa akses data cuaca real-time.";
+
+    }
+
+
+    // Matematika
+
+    const mathResult = calculate(lower);
+
+    if (mathResult) {
+        return mathResult;
+    }
+
+
+    // Waktu
+
+    if (
+        lower.includes("jam berapa") ||
+        lower.includes("sekarang jam")
+    ) {
+
+        return "Waktu di perangkatmu sekarang adalah " +
+            new Date().toLocaleTimeString("id-ID");
+
+    }
+
+
+    // Pertanyaan umum
+
+    if (
+        lower.includes("apa itu ai") ||
+        lower.includes("apa itu artificial intelligence")
+    ) {
+
+        return "AI adalah teknologi yang memungkinkan komputer melakukan tugas yang biasanya membutuhkan kecerdasan manusia, seperti memahami bahasa dan mengenali pola.";
+
+    }
+
+
+    if (
+        lower.includes("apa itu internet")
+    ) {
+
+        return "Internet adalah jaringan global yang menghubungkan banyak komputer dan perangkat untuk bertukar informasi.";
+
+    }
+
+
+    // Perpisahan
+
+    if (
+        lower.includes("dadah") ||
+        lower.includes("bye") ||
+        lower.includes("sampai jumpa")
+    ) {
+
+        return "Sampai jumpa! 👋";
+
+    }
+
+
+    // Jawaban default
+
+    const answers = [
+
+        "Menarik! Bisa jelaskan sedikit lebih detail?",
+        "Aku belum sepenuhnya memahami pertanyaan itu. Coba gunakan kalimat yang berbeda.",
+        "Hmm 🤔 aku perlu lebih banyak informasi untuk menjawabnya.",
+        "Aku masih belajar. Coba tanyakan sesuatu yang lebih spesifik.",
+        "Pertanyaan bagus! Tapi untuk pertanyaan seperti itu aku membutuhkan kemampuan AI yang lebih canggih."
+
+    ];
+
+    return answers[Math.floor(Math.random() * answers.length)];
+
+}
+
+
+function sendMessage() {
+
+    const input = document.getElementById("input");
+
+    const text = input.value.trim();
+
+    if (!text) return;
+
+
+    addMessage(text, "user");
+
+    input.value = "";
+
+
+    setTimeout(function() {
+
+        const answer = chatbot(text);
+
+        addMessage(answer, "bot");
+
+    }, 350);
+
+}
+
+
+document
+    .getElementById("input")
+    .addEventListener("keydown", function(event) {
+
+        if (event.key === "Enter") {
+
+            sendMessage();
+
+        }
+
+    });
+
+</script>
+
+</body>
+  </html>
